@@ -96,6 +96,35 @@ def t(key, **kw):
     return STRINGS[LANG][key].format(**kw)
 
 
+def promote_tray_icon():
+    """Fixa o ícone na barra (em vez de escondê-lo na seta ^).
+
+    O Windows guarda a escolha em HKCU/Control Panel/NotifyIconSettings, uma entrada por .exe.
+    Só mexe em entradas novas (sem IsPromoted), então quem desafixar manualmente é respeitado.
+    """
+    if not getattr(sys, "frozen", False):
+        return
+    exe = os.path.normcase(os.path.abspath(sys.executable))
+    base = r"Control Panel\NotifyIconSettings"
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, base) as root:
+            for i in range(winreg.QueryInfoKey(root)[0]):
+                try:
+                    with winreg.OpenKey(root, winreg.EnumKey(root, i), 0,
+                                        winreg.KEY_READ | winreg.KEY_SET_VALUE) as k:
+                        path = os.path.normcase(winreg.QueryValueEx(k, "ExecutablePath")[0])
+                        if path != exe:
+                            continue
+                        try:
+                            winreg.QueryValueEx(k, "IsPromoted")
+                        except FileNotFoundError:
+                            winreg.SetValueEx(k, "IsPromoted", 0, winreg.REG_DWORD, 1)
+                except OSError:
+                    continue
+    except OSError:
+        pass
+
+
 def load_config():
     cfg = dict(DEFAULTS)
     try:
@@ -270,6 +299,7 @@ class App:
                 self.placeholder = None
         if created:
             self.stop.wait(1.5)  # deixa os ícones aparecerem antes de notificar
+            promote_tray_icon()
 
     def apply_ui_async(self):
         """Usado pelos itens do menu: nunca bloqueia o clique."""

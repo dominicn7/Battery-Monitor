@@ -10,8 +10,8 @@ A Windows tray app that shows the battery level of your Bluetooth peripherals (o
 - Optional start with Windows. Runs as a single instance and uses almost no resources.
 
 ## Usage
-1. Download `BatteryMonitor-v1.0.0.zip` from the [Releases](../../releases) page, extract it and run `BatteryMonitor.exe`. No installation or Python required.
-2. Windows hides new tray icons. Click the `^` arrow next to the clock and drag the icons onto the taskbar once.
+1. Download `BatteryMonitor-v1.0.1.zip` from the [Releases](../../releases) page, extract it and run `BatteryMonitor.exe`. No installation or Python required.
+2. The icons pin themselves to the taskbar automatically a few seconds after the first start. If you unpin one on purpose, the app respects that.
 3. Right-click any icon for the menu: critical level, alert sound, test alert, language, start with Windows.
 
 ## Limitations
